@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Builder</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>Study Builder</h1>
+      <div class="header-buttons">
+        <button title="Usuário">👤</button>
+        <button title="Configurações">⚙️</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2>Suas Rotinas de Estudo</h2>
+      <p>Crie e gerencie seus ciclos de estudo personalizados</p>
+
+      <div id="emptyState" class="empty">
+        <p>Nenhuma rotina criada ainda.</p>
+        <button id="createFirstBtn">Criar primeira rotina</button>
+      </div>
+
+      <div id="routineList" class="grid"></div>
+    </main>
+
+    <button id="floatingBtn" class="floating-btn">+</button>
+
+    <!-- Modal -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Nova Rotina de Estudo</h3>
+
+        <label>Tipo de rotina:</label>
+        <select id="type">
+          <option value="">Selecione</option>
+          <option value="enem">ENEM</option>
+          <option value="prova">Prova Escolar</option>
+          <option value="concurso">Concurso</option>
+        </select>
+
+        <div id="subjectFields" class="hidden">
+          <label>Assunto:</label>
+          <input id="subject" placeholder="Ex: Matemática, Física..." />
+
+          <label>Materiais (opcional):</label>
+          <textarea id="materials" placeholder="Ex: Apostila ENEM"></textarea>
+        </div>
+
+        <div id="difficultyField" class="hidden">
+          <label>Dificuldades:</label>
+          <textarea id="difficulty" placeholder="Ex: Redação, Matemática..."></textarea>
+        </div>
+
+        <label>Estudar até quando?</label>
+        <input type="date" id="endDate" />
+
+        <label>Dias por semana:</label>
+        <input type="number" id="days" min="1" max="7" placeholder="5" />
+
+        <label>Horas por dia:</label>
+        <input type="number" id="hours" min="1" max="24" placeholder="2" />
+
+        <div class="modal-actions">
+          <button id="cancelBtn" class="outline">Cancelar</button>
+          <button id="saveBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

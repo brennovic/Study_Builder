@@ -1,0 +1,77 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+.header {
+  background-color: #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #333;
+}
+
+button {
+  background-color: #6c63ff;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #5848e2;
+}
+
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.dia-card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: 0.2s;
+}
+
+.dia-card.completed {
+  border-color: #4caf50;
+  background: #172917;
+}
+
+.dia-card h3 {
+  color: #9fa8da;
+  margin-bottom: 0.5rem;
+}
+
+.tarefas {
+  list-style: none;
+  padding: 0;
+}
+
+.tarefas li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+}
+
+.tarefas input[type="checkbox"] {
+  transform: scale(1.3);
+}
+
+.progresso {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #aaa;
+}

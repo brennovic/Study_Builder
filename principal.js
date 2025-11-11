@@ -39,9 +39,10 @@ function renderRoutines() {
       ${r.subject ? `<p>📘 ${r.subject}</p>` : ""}
       ${r.difficulty ? `<p>🎯 ${r.difficulty}</p>` : ""}
       <div style="margin-top:1rem;display:flex;gap:0.5rem;justify-content:center;">
-        <button class="outline" onclick="viewDetails('${
-          r.id
-        }')">Ver detalhes</button>
+       <button class="outline" onclick="abrirRotina('${
+         r.id
+       }')">Ver rotina</button>
+
         <button onclick="deleteRoutine('${r.id}')">Excluir</button>
       </div>
     `;
@@ -146,7 +147,6 @@ async function gerarRotinaGemini(prompt) {
   );
 }
 
-
 // --- Ação do botão "Salvar" ---
 saveBtn.addEventListener("click", async () => {
   const newRoutine = {
@@ -193,3 +193,6 @@ floatingBtn.addEventListener("click", openModal);
 createFirstBtn.addEventListener("click", openModal);
 
 renderRoutines();
+function abrirRotina(id) {
+  window.location.href = `rotina.html?id=${id}`;
+}

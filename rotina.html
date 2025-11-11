@@ -1,24 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sua Rotina de Estudos</title>
-    <link rel="stylesheet" href="rotina.css" />
-  </head>
-  <body>
-    <header class="header">
-      <h1>📚 Rotina de Estudos</h1>
-      <button id="voltarBtn">⬅ Voltar</button>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotina de Estudos</title>
+  <link rel="stylesheet" href="rotina.css">
+</head>
+<body>
+  <div class="container">
+    <h1 id="tituloRotina">Gerando rotina...</h1>
+    <p id="descricaoRotina"></p>
+    <div id="diasContainer" class="dias"></div>
+    <button id="voltarBtn">Voltar</button>
+  </div>
 
-    <main class="container">
-      <h2 id="tituloRotina">Carregando...</h2>
-      <p id="descricaoRotina"></p>
-
-      <div id="diasContainer" class="dias"></div>
-    </main>
-
-    <script src="rotina.js"></script>
-  </body>
+  <script src="rotina.js"></script>
+</body>
 </html>

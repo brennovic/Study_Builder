@@ -1,3 +1,7 @@
+// ============================
+// VARIÁVEIS PRINCIPAIS
+// ============================
+
 const routines = JSON.parse(localStorage.getItem("routines") || "[]");
 const list = document.getElementById("routineList");
 const emptyState = document.getElementById("emptyState");
@@ -10,9 +14,17 @@ const type = document.getElementById("type");
 const subjectFields = document.getElementById("subjectFields");
 const difficultyField = document.getElementById("difficultyField");
 
-const API_KEY = "AIzaSyCCvPR28WmKKWovIhSo3gZvOl0bCbz2wrE"; // coloque sua API key Gemini aqui
+const pdfInput = document.getElementById("pdfInput");
+const pdfList = document.getElementById("pdfList");
+let pdfFilesBase64 = [];
 
-// ---------- Renderiza as rotinas ----------
+const API_KEY = "AIzaSyCCvPR28WmKKWovIhSo3gZvOl0bCbz2wrE";
+
+
+// ============================
+// RENDERIZA AS ROTINAS
+// ============================
+
 function renderRoutines() {
   list.innerHTML = "";
   if (routines.length === 0) {
@@ -27,6 +39,12 @@ function renderRoutines() {
     const card = document.createElement("div");
     card.className = "card";
 
+    const hoje = new Date();
+    const fim = new Date(r.endDate);
+    const diffMs = fim - hoje > 0 ? fim - hoje : 0;
+    const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const diffSemanas = Math.ceil(diffDias / 7);
+
     card.innerHTML = `
       <h3>${
         r.type === "enem"
@@ -37,6 +55,7 @@ function renderRoutines() {
       }</h3>
       <p>${r.hoursPerDay}h/dia · ${r.daysPerWeek} dias/semana</p>
       <p>Até: ${new Date(r.endDate).toLocaleDateString("pt-BR")}</p>
+      <p>⏳ ${diffDias} dias restantes (${diffSemanas} semanas)</p>
       <button onclick="abrirRotina('${r.id}')">Ver rotina</button>
       <button class="outline" onclick="deleteRoutine('${r.id}')">Excluir</button>
     `;
@@ -57,6 +76,11 @@ function deleteRoutine(id) {
   }
 }
 
+
+// ============================
+// CAMPOS CONDICIONAIS DO FORM
+// ============================
+
 type.addEventListener("change", () => {
   const val = type.value;
   subjectFields.classList.toggle(
@@ -66,31 +90,116 @@ type.addEventListener("change", () => {
   difficultyField.classList.toggle("hidden", val !== "enem");
 });
 
-// ---------- IA: Gera rotina dia a dia ----------
+
+// ============================
+// UPLOAD DE PDFs
+// ============================
+
+pdfInput.addEventListener("change", async (e) => {
+  const files = Array.from(e.target.files);
+  pdfFilesBase64 = [];
+
+  pdfList.innerHTML = "<p>Carregando PDFs...</p>";
+
+  for (let file of files) {
+    const base64 = await fileToBase64(file);
+    pdfFilesBase64.push({
+      name: file.name,
+      data: base64,
+    });
+  }
+
+  pdfList.innerHTML = pdfFilesBase64
+    .map((f) => `<p>📄 ${f.name}</p>`)
+    .join("");
+});
+
+function fileToBase64(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+
+// ============================
+// EXTRAIR TEXTO DO PDF (PDF.js)
+// ============================
+
+async function extractTextFromPDF(base64) {
+  const pdfData = atob(base64.split(",")[1]);
+
+  const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+  const pdf = await loadingTask.promise;
+
+  let text = "";
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item) => item.str);
+    text += strings.join(" ") + "\n";
+  }
+
+  return text;
+}
+
+
+// ============================
+// JUNTA MATERIAIS + PDFs
+// ============================
+
+async function coletarTextoDosMateriais(r) {
+  let texto = "";
+
+  if (r.materials) {
+    texto += `Materiais escritos:\n${r.materials}\n\n`;
+  }
+
+  if (r.pdfs && r.pdfs.length > 0) {
+    texto += "Conteúdo extraído dos PDFs:\n";
+
+    for (const pdf of r.pdfs) {
+      const textoPDF = await extractTextFromPDF(pdf.data);
+
+      texto += `
+============ PDF: ${pdf.name} ============
+${textoPDF}
+==========================================
+`
+console.log("Texto extraído:", textoPDF);
+
+;
+    }
+  }
+
+  return texto;
+}
+
+
+// ============================
+// IA: GERAR ROTINA DIA A DIA
+// ============================
+
 async function gerarRotinaDiaADia(r) {
-  const totalDias = Math.min(Math.ceil(r.daysPerWeek * 2), 10); // até 10 dias
+  const hoje = new Date();
+  const fim = new Date(r.endDate);
+  const diffMs = fim - hoje > 0 ? fim - hoje : 0;
+  const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  const totalDias = Math.min(diffDias, r.daysPerWeek * 2, 15);
   const rotinaGerada = {};
 
   for (let dia = 1; dia <= totalDias; dia++) {
-    const prompt = `
-Sou um professor criando uma rotina de estudos ${
+    const prompt =
       r.type === "enem"
-        ? "para o ENEM"
-        : r.type === "prova"
-        ? "para uma prova escolar"
-        : "para um concurso público"
-    }.
+        ? gerarPromptENEM(r, dia, totalDias)
+        : gerarPromptGeral(r, dia, totalDias);
 
-Me diga de forma curta o que o aluno deve estudar no Dia ${dia}, em formato de lista simples, com tópicos curtos.
+    const materiaisTexto = await coletarTextoDosMateriais(r);
 
-Exemplo de resposta esperada:
-- Matemática: Equações do 2º grau
-- História: Grécia Antiga
-- Redação: Tema social
-
-Não inclua explicações, apenas a lista.`;
-
-    const resposta = await gerarRespostaIA(prompt);
+    const resposta = await gerarRespostaIA(prompt, materiaisTexto);
     if (!resposta) continue;
 
     const topicos = resposta
@@ -104,16 +213,83 @@ Não inclua explicações, apenas a lista.`;
   return rotinaGerada;
 }
 
-// ---------- Função para chamar o Gemini ----------
-async function gerarRespostaIA(prompt) {
+
+// ============================
+// PROMPT ENEM
+// ============================
+
+function gerarPromptENEM(r, dia, totalDias) {
+  const dificuldade = r.difficulty ? r.difficulty : "nenhuma área específica";
+  return `
+Você é um professor especialista em ENEM.
+Crie uma rotina de estudos equilibrada em ${totalDias} dias, ${r.hoursPerDay} horas por dia.
+O aluno tem dificuldade em ${dificuldade}.
+
+Monte a lista do que estudar no Dia ${dia}, incluindo:
+- Linguagens
+- Matemática
+- Ciências Humanas
+- Ciências da Natureza
+- Tema de Redação
+
+Responda apenas com tópicos.
+`;
+}
+
+
+// ============================
+// PROMPT GERAL
+// ============================
+
+function gerarPromptGeral(r, dia, totalDias) {
+  const assunto = r.subject ? `O foco principal é: ${r.subject}.` : "";
+  const dificuldade = r.difficulty
+    ? `O aluno tem dificuldade em: ${r.difficulty}.`
+    : "";
+
+  return `
+Sou um professor criando uma rotina de estudos 
+${r.type === "prova" ? "para prova escolar" : "para concurso público"}.
+
+O aluno estudará ${r.hoursPerDay}h por dia, ${r.daysPerWeek} dias por semana.
+Dia ${dia} de ${totalDias}.
+
+${assunto}
+${dificuldade}
+
+Liste tópicos curtos do que deve ser estudado hoje.
+`;
+}
+
+
+// ============================
+// IA (Gemini)
+// ============================
+
+async function gerarRespostaIA(prompt, materiaisTexto) {
   try {
+    const promptFinal = `
+${prompt}
+
+-----------------------------------------
+MATERIAIS DO ALUNO (TEXTOS + PDFs)
+Use exclusivamente o conteúdo abaixo para gerar os tópicos:
+${materiaisTexto}
+-----------------------------------------
+
+REGRAS:
+- Não invente conteúdo que não esteja nos materiais.
+- Escolha somente temas realmente presentes nos textos.
+- Produza apenas tópicos de estudo.
+`;
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          contents: [{ role: "user", parts: [{ text: promptFinal }] }],
         }),
       }
     );
@@ -127,7 +303,11 @@ async function gerarRespostaIA(prompt) {
   }
 }
 
-// ---------- Botão Salvar ----------
+
+// ============================
+// SALVAR ROTINA
+// ============================
+
 saveBtn.addEventListener("click", async () => {
   const newRoutine = {
     id: Date.now().toString(),
@@ -138,6 +318,7 @@ saveBtn.addEventListener("click", async () => {
     subject: document.getElementById("subject").value || undefined,
     materials: document.getElementById("materials").value || undefined,
     difficulty: document.getElementById("difficulty").value || undefined,
+    pdfs: pdfFilesBase64.length > 0 ? pdfFilesBase64 : [],
   };
 
   if (!newRoutine.type || !newRoutine.endDate) {
@@ -148,7 +329,6 @@ saveBtn.addEventListener("click", async () => {
   saveBtn.disabled = true;
   saveBtn.textContent = "Gerando rotina...";
 
-  // 🔹 Gera rotina dia a dia com IA
   const rotinaGerada = await gerarRotinaDiaADia(newRoutine);
 
   newRoutine.generatedRoutine = rotinaGerada;
@@ -160,7 +340,17 @@ saveBtn.addEventListener("click", async () => {
   modal.classList.add("hidden");
   renderRoutines();
   alert("Rotina criada com sucesso!");
+
+  // limpar PDFs
+  pdfInput.value = "";
+  pdfFilesBase64 = [];
+  pdfList.innerHTML = "";
 });
+
+
+// ============================
+// BOTÕES
+// ============================
 
 cancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
 floatingBtn.addEventListener("click", () => modal.classList.remove("hidden"));

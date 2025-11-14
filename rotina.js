@@ -1,4 +1,3 @@
-// Lê o ID da rotina da URL
 const params = new URLSearchParams(window.location.search);
 const rotinaId = params.get("id");
 
@@ -20,11 +19,15 @@ if (!rotina) {
       ? "Prova Escolar"
       : "Concurso Público";
 
-  descricaoRotina.textContent = `Estudar até ${new Date(
-    rotina.endDate
-  ).toLocaleDateString("pt-BR")}, ${rotina.hoursPerDay}h por dia, ${
-    rotina.daysPerWeek
-  }x por semana.`;
+  const hoje = new Date();
+  const fim = new Date(rotina.endDate);
+  const diffMs = fim - hoje > 0 ? fim - hoje : 0;
+  const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const diffSemanas = Math.ceil(diffDias / 7);
+
+  descricaoRotina.textContent = `Estudar até ${fim.toLocaleDateString(
+    "pt-BR"
+  )} — ${rotina.hoursPerDay}h/dia · ${rotina.daysPerWeek} dias/semana (${diffDias} dias restantes ≈ ${diffSemanas} semanas).`;
 
   gerarDias(rotina);
 }
@@ -42,29 +45,52 @@ function gerarDias(r) {
     return;
   }
 
-  Object.entries(rotina).forEach(([dia, topicos], i) => {
+  // Garante que os dias fiquem ordenados corretamente (Dia 1, Dia 2, etc.)
+  const diasOrdenados = Object.keys(rotina)
+    .sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, "")) || 0;
+      const numB = parseInt(b.replace(/\D/g, "")) || 0;
+      return numA - numB;
+    });
+
+  let semanaAtual = 1;
+  let diasNaSemana = 0;
+  let semanaDiv = document.createElement("div");
+  semanaDiv.className = "semana";
+
+  const tituloSemana = document.createElement("h2");
+  tituloSemana.textContent = `📘 Semana ${semanaAtual}`;
+  semanaDiv.appendChild(tituloSemana);
+
+  diasContainer.appendChild(semanaDiv);
+
+  diasOrdenados.forEach((diaChave, i) => {
+    const topicos = rotina[diaChave];
+
+    // Cria um card do dia
     const card = document.createElement("div");
     card.className = "dia-card";
 
     const tarefasHTML = topicos
       .map(
         (t, index) => `
-        <li>
-          <input type="checkbox" id="dia${i}-tarefa${index}" />
-          <label for="dia${i}-tarefa${index}">${t}</label>
-        </li>
-      `
+          <li>
+            <input type="checkbox" id="dia${i}-tarefa${index}" />
+            <label for="dia${i}-tarefa${index}">${t}</label>
+          </li>
+        `
       )
       .join("");
 
     card.innerHTML = `
-      <h3>${dia}</h3>
+      <h3>${diaChave}</h3>
       <ul class="tarefas">${tarefasHTML}</ul>
       <p class="progresso">0/${topicos.length} concluídas</p>
     `;
 
-    diasContainer.appendChild(card);
+    semanaDiv.appendChild(card);
 
+    // Atualiza progresso
     const checkboxes = card.querySelectorAll('input[type="checkbox"]');
     const progresso = card.querySelector(".progresso");
 
@@ -76,5 +102,22 @@ function gerarDias(r) {
         card.classList.toggle("completed", feitos === topicos.length);
       })
     );
+
+    // Conta dias e cria nova semana quando necessário
+    diasNaSemana++;
+    if (diasNaSemana === 5 && i !== diasOrdenados.length - 1) {
+      diasNaSemana = 0;
+      semanaAtual++;
+
+      semanaDiv = document.createElement("div");
+      semanaDiv.className = "semana";
+
+      const novoTitulo = document.createElement("h2");
+      novoTitulo.textContent = `📘 Semana ${semanaAtual}`;
+      semanaDiv.appendChild(novoTitulo);
+
+      diasContainer.appendChild(semanaDiv);
+    }
   });
 }
+

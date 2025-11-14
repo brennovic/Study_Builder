@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -48,11 +48,18 @@
 
           <label>Materiais (opcional):</label>
           <textarea id="materials" placeholder="Ex: Apostila ENEM"></textarea>
+
+          <label>Enviar PDF (opcional):</label>
+          <input type="file" id="pdfInput" accept="application/pdf" multiple />
+          <div id="pdfList"></div>
         </div>
 
         <div id="difficultyField" class="hidden">
           <label>Dificuldades:</label>
-          <textarea id="difficulty" placeholder="Ex: Redação, Matemática..."></textarea>
+          <textarea
+            id="difficulty"
+            placeholder="Ex: Redação, Matemática..."
+          ></textarea>
         </div>
 
         <label>Estudar até quando?</label>
@@ -72,5 +79,7 @@
     </div>
 
     <script src="principal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   </body>
 </html>

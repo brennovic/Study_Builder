@@ -1,3 +1,7 @@
+/* ============================ */
+/*        ESTILOS GERAIS        */
+/* ============================ */
+
 body {
   font-family: Arial, sans-serif;
   background-color: #121212;
@@ -12,17 +16,11 @@ body {
   padding: 1rem;
 }
 
-/* ---- Cabeçalho (opcional se quiser usar depois) ---- */
-.header {
-  background-color: #1f1f1f;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid #333;
-}
 
-/* ---- Botões ---- */
+/* ============================ */
+/*            BOTÕES           */
+/* ============================ */
+
 button {
   background-color: #6c63ff;
   color: #fff;
@@ -37,27 +35,69 @@ button:hover {
   background-color: #5848e2;
 }
 
-/* ---- Seções de semanas ---- */
+
+/* ============================ */
+/*       HEADER DA ROTINA       */
+/* ============================ */
+
+.rotina-info {
+  margin-top: 20px;
+}
+
+.header-card {
+  background: #1a1a1a;
+  border-left: 4px solid #6c63ff; /* linha lateral — minimalista */
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.titulo-estilizado {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.descricao-estilizada {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #d3d3d3;
+  line-height: 1.5;
+}
+
+.descricao-estilizada span {
+  color: #6c63ff;
+  font-weight: bold;
+}
+
+
+/* ============================ */
+/*     SEMANAS E ORGANIZAÇÃO    */
+/* ============================ */
+
 .semana {
-  margin-bottom: 2rem;
-  padding: 1rem;
   background: #181818;
   border-radius: 12px;
-  border: 1px solid #2a2a2a;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  border-left: 4px solid #6c63ff;
+  padding: 1rem;
+  margin-bottom: 2rem;
 }
 
 .semana h2 {
   color: #6c63ff;
-  border-left: 4px solid #6c63ff;
-  padding-left: 0.5rem;
   margin-bottom: 1rem;
 }
 
-/* ---- Cartões de dias ---- */
+
+/* ============================ */
+/*            DAY CARD          */
+/* ============================ */
+
 .dia-card {
   background: #1e1e1e;
-  border: 1px solid #333;
+  border-left: 3px solid #6c63ff; /* linha lateral discreta */
   border-radius: 10px;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -65,41 +105,80 @@ button:hover {
 }
 
 .dia-card.completed {
-  border-color: #4caf50;
+  border-left: 3px solid #4caf50; /* concluído */
   background: #172917;
 }
 
-.dia-card h3 {
-  color: #9fa8da;
-  margin-bottom: 0.5rem;
+
+/* ============================ */
+/*         TAREFAS LISTA        */
+/* ============================ */
+
+.tarefa-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #262626;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.6rem;
+  transition: 0.2s ease;
 }
 
-/* ---- Lista de tarefas ---- */
-.tarefas {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.tarefa-item:hover {
+  background: #2f2f2f;
 }
 
-.tarefas li {
+.texto-tarefa {
+  flex: 1;
+  color: #eee;
+  font-size: 0.95rem;
+}
+
+.acoes-tarefa {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
-.tarefas input[type="checkbox"] {
-  transform: scale(1.3);
+
+/* Botão editar */
+.editar-btn {
+  background: #444;
+  color: #fff;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
-/* ---- Progresso ---- */
+.editar-btn:hover {
+  background: #666;
+}
+
+
+/* Checkbox */
+.tarefa-item input[type="checkbox"] {
+  transform: scale(1.4);
+  cursor: pointer;
+}
+
+
+/* ============================ */
+/*        PROGRESSO CARD        */
+/* ============================ */
+
 .progresso {
   margin-top: 1rem;
   font-size: 0.9rem;
   color: #aaa;
 }
 
-/* ---- Botão Voltar ---- */
+
+/* ============================ */
+/*         BOTÃO VOLTAR         */
+/* ============================ */
+
 #voltarBtn {
   display: block;
   margin: 2rem auto 0;
@@ -114,21 +193,70 @@ button:hover {
   background-color: #444;
 }
 
-/* ---- Responsividade ---- */
+
+/* ============================ */
+/*         POPUPS GERAIS         */
+/* ============================ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup {
+  background: #1a1a1a;
+  border-left: 4px solid #6c63ff;
+  padding: 25px;
+  width: 320px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+
+/* Botões do popup */
+.popup button {
+  background: #1f1f1f;
+  color: #6c63ff;
+  border: 1px solid #6c63ff;
+  padding: 10px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.popup button:hover {
+  background: #2b2b2b;
+}
+
+#editPopup input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid #bbb;
+}
+
+
+/* ============================ */
+/*         RESPONSIVIDADE       */
+/* ============================ */
+
 @media (max-width: 600px) {
   .container {
     padding: 0.5rem;
   }
 
-  .semana {
-    padding: 0.8rem;
+  .tarefa-item {
+    padding: 0.6rem;
   }
 
-  .dia-card {
-    padding: 0.8rem;
-  }
-
-  button, #voltarBtn {
+  button, #voltarBtn, .popup button {
     width: 100%;
   }
 }

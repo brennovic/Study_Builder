@@ -7,12 +7,43 @@
   <link rel="stylesheet" href="rotina.css">
 </head>
 <body>
-  <div class="container">
-    <h1 id="tituloRotina">Gerando rotina...</h1>
-    <p id="descricaoRotina"></p>
-    <div id="diasContainer" class="dias"></div>
-    <button id="voltarBtn">Voltar</button>
+  <div class="container rotina-info">
+
+  <div class="header-card">
+    <h1 id="tituloRotina" class="titulo-estilizado">Gerando rotina...</h1>
+
+    <p id="descricaoRotina" class="descricao-estilizada"></p>
   </div>
+
+  <div id="diasContainer" class="dias"></div>
+
+  <button id="voltarBtn" class="voltar-btn">⬅ Voltar</button>
+</div>
+
+ <!-- POPUP PAUSA -->
+<div id="pausePopup" class="overlay">
+  <div class="popup">
+    <h3 id="pauseText">Pausa de 20 segundos</h3>
+
+    <button id="increase">+ 15s</button>
+    <button id="decrease">- 15s</button>
+
+    
+  </div>
+</div>
+
+<!-- POPUP EDITAR TEXTO -->
+<div id="editPopup" class="overlay">
+  <div class="popup">
+    <h3>Editar texto</h3>
+    <input id="editInput" 
+           style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:1rem;">
+
+    <button id="saveEdit">Salvar</button>
+  </div>
+</div>
+
+
 
   <script src="rotina.js"></script>
 </body>

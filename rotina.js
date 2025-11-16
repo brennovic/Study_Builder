@@ -6,7 +6,7 @@ const descricaoRotina = document.getElementById("descricaoRotina");
 const diasContainer = document.getElementById("diasContainer");
 const voltarBtn = document.getElementById("voltarBtn");
 
-const rotinas = JSON.parse(localStorage.getItem("routines") || "[]");
+let rotinas = JSON.parse(localStorage.getItem("routines") || "[]");
 const rotina = rotinas.find((r) => r.id === rotinaId);
 
 if (!rotina) {
@@ -36,6 +36,10 @@ voltarBtn.addEventListener("click", () => {
   window.location.href = "principal.html";
 });
 
+
+// ===============================================
+// GERAR DIAS
+// ===============================================
 function gerarDias(r) {
   diasContainer.innerHTML = "";
 
@@ -45,16 +49,15 @@ function gerarDias(r) {
     return;
   }
 
-  // Garante que os dias fiquem ordenados corretamente (Dia 1, Dia 2, etc.)
-  const diasOrdenados = Object.keys(rotina)
-    .sort((a, b) => {
-      const numA = parseInt(a.replace(/\D/g, "")) || 0;
-      const numB = parseInt(b.replace(/\D/g, "")) || 0;
-      return numA - numB;
-    });
+  const diasOrdenados = Object.keys(rotina).sort((a, b) => {
+    const numA = parseInt(a.replace(/\D/g, "")) || 0;
+    const numB = parseInt(b.replace(/\D/g, "")) || 0;
+    return numA - numB;
+  });
 
   let semanaAtual = 1;
   let diasNaSemana = 0;
+
   let semanaDiv = document.createElement("div");
   semanaDiv.className = "semana";
 
@@ -67,18 +70,21 @@ function gerarDias(r) {
   diasOrdenados.forEach((diaChave, i) => {
     const topicos = rotina[diaChave];
 
-    // Cria um card do dia
     const card = document.createElement("div");
     card.className = "dia-card";
 
     const tarefasHTML = topicos
       .map(
         (t, index) => `
-          <li>
-            <input type="checkbox" id="dia${i}-tarefa${index}" />
-            <label for="dia${i}-tarefa${index}">${t}</label>
-          </li>
-        `
+        <li class="tarefa-item">
+          <span class="texto-tarefa" id="texto-${i}-${index}">${t}</span>
+
+          <div class="acoes-tarefa">
+            <button class="editar-btn" data-i="${i}" data-index="${index}">✏️</button>
+            <input type="checkbox" id="dia${i}-tarefa${index}" class="check-tarefa" />
+          </div>
+        </li>
+      `
       )
       .join("");
 
@@ -90,20 +96,37 @@ function gerarDias(r) {
 
     semanaDiv.appendChild(card);
 
-    // Atualiza progresso
-    const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+    const checkboxes = card.querySelectorAll(".check-tarefa");
     const progresso = card.querySelector(".progresso");
 
+    // CHECKBOX → abrir popup de pausa
     checkboxes.forEach((cb) =>
       cb.addEventListener("change", () => {
-        const feitos = card.querySelectorAll('input[type="checkbox"]:checked')
-          .length;
+        const feitos = card.querySelectorAll(".check-tarefa:checked").length;
+
         progresso.textContent = `${feitos}/${topicos.length} concluídas`;
         card.classList.toggle("completed", feitos === topicos.length);
+
+        if (cb.checked) {
+          openPausePopup();
+        }
       })
     );
 
-    // Conta dias e cria nova semana quando necessário
+    // EDITAR TEXTO
+    const botoesEditar = card.querySelectorAll(".editar-btn");
+
+    botoesEditar.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const diaIndex = btn.dataset.i;
+        const tarefaIndex = btn.dataset.index;
+
+        const span = document.getElementById(`texto-${diaIndex}-${tarefaIndex}`);
+
+        openEditPopup(span);
+      });
+    });
+
     diasNaSemana++;
     if (diasNaSemana === 5 && i !== diasOrdenados.length - 1) {
       diasNaSemana = 0;
@@ -121,3 +144,92 @@ function gerarDias(r) {
   });
 }
 
+
+
+// ===============================================
+// POPUP DE PAUSA – PRETO/ROXO, AUTOMÁTICO, FECHA AO TERMINAR
+// ===============================================
+
+const pausePopup = document.getElementById("pausePopup");
+const pauseText = document.getElementById("pauseText");
+const btnIncrease = document.getElementById("increase");
+const btnDecrease = document.getElementById("decrease");
+
+let pauseSeconds = 20;
+let countdownInterval = null;
+
+function openPausePopup() {
+
+  pauseSeconds = 20;
+
+  // Reinicia o contador
+  clearInterval(countdownInterval);
+
+  // Mostrar popup
+  pausePopup.style.display = "flex";
+  pauseText.textContent = `Pausa: ${pauseSeconds}s`;
+
+  // Inicia a contagem automática
+  countdownInterval = setInterval(() => {
+    pauseSeconds--;
+    pauseText.textContent = `Pausa: ${pauseSeconds}s`;
+
+    // FECHA AO CHEGAR EM ZERO
+    if (pauseSeconds <= 0) {
+      clearInterval(countdownInterval);
+
+      pauseText.textContent = "Pausa concluída!";
+
+      setTimeout(() => {
+        pausePopup.style.display = "none";
+      }, 600); // pequena espera para mostrar "concluída"
+    }
+  }, 1000);
+}
+
+// Aumentar 15 segundos
+btnIncrease.onclick = () => {
+  pauseSeconds += 15;
+  pauseText.textContent = `Pausa: ${pauseSeconds}s`;
+};
+
+// Diminuir 15 segundos
+btnDecrease.onclick = () => {
+  pauseSeconds = Math.max(0, pauseSeconds - 15);
+  pauseText.textContent = `Pausa: ${pauseSeconds}s`;
+};
+
+
+
+
+// ===============================================
+// POPUP EDITAR TEXTO – PRETO/ROXO
+// ===============================================
+const editPopup = document.getElementById("editPopup");
+const editInput = document.getElementById("editInput");
+const saveEdit = document.getElementById("saveEdit");
+
+let labelBeingEdited = null;
+
+function openEditPopup(labelElement) {
+  labelBeingEdited = labelElement;
+  editInput.value = labelElement.textContent;
+  editPopup.style.display = "flex";
+}
+
+saveEdit.onclick = () => {
+  const newText = editInput.value.trim();
+
+  if (newText && labelBeingEdited) {
+    labelBeingEdited.textContent = newText;
+
+    const idParts = labelBeingEdited.id.split("-");
+    const diaIndex = idParts[1];
+    const tarefaIndex = idParts[2];
+
+    rotina.generatedRoutine[`Dia ${parseInt(diaIndex) + 1}`][tarefaIndex] = newText;
+    localStorage.setItem("routines", JSON.stringify(rotinas));
+  }
+
+  editPopup.style.display = "none";
+};

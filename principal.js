@@ -268,7 +268,21 @@ Liste tópicos curtos do que deve ser estudado hoje.
 
 async function gerarRespostaIA(prompt, materiaisTexto) {
   try {
-    const promptFinal = `
+    let promptFinal;
+    if (!materiaisTexto || materiaisTexto.trim().length === 0) {
+      // Aqui gera um prompt sem restrição a materiais para o ENEM
+      promptFinal = `
+${prompt}
+
+-----------------------------------------
+Não há materiais fornecidos. Gere uma rotina de estudos baseada no conhecimento padrão do ENEM.
+-----------------------------------------
+
+REGRAS:
+- Produza apenas tópicos de estudo.
+      `;
+    } else {
+      promptFinal = `
 ${prompt}
 
 -----------------------------------------
@@ -281,8 +295,10 @@ REGRAS:
 - Não invente conteúdo que não esteja nos materiais.
 - Escolha somente temas realmente presentes nos textos.
 - Produza apenas tópicos de estudo.
-`;
+      `;
+    }
 
+    // Chamada à API permanece a mesma
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
       {
@@ -302,6 +318,7 @@ REGRAS:
     return null;
   }
 }
+
 
 
 // ============================

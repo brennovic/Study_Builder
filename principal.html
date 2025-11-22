@@ -31,16 +31,16 @@
 
     <!-- Modal -->
     <div id="modal" class="modal hidden">
+      
       <div class="modal-content">
         <h3>Nova Rotina de Estudo</h3>
 
         <label>Tipo de rotina:</label>
-        <select id="type">
-          <option value="">Selecione</option>
-          <option value="enem">ENEM</option>
-          <option value="prova">Prova Escolar</option>
-          <option value="concurso">Concurso</option>
-        </select>
+        <div id="typeButtons" class="type-buttons">
+          <button data-type="enem" class="type-btn">ENEM</button>
+          <button data-type="prova" class="type-btn">Prova</button>
+        </div>
+        <input type="hidden" id="type" />
 
         <div id="subjectFields" class="hidden">
           <label>Assunto:</label>

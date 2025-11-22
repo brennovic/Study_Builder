@@ -81,14 +81,22 @@ function deleteRoutine(id) {
 // CAMPOS CONDICIONAIS DO FORM
 // ============================
 
-type.addEventListener("change", () => {
-  const val = type.value;
-  subjectFields.classList.toggle(
-    "hidden",
-    !(val === "prova" || val === "concurso")
-  );
-  difficultyField.classList.toggle("hidden", val !== "enem");
+const typeButtons = document.querySelectorAll(".type-btn");
+
+typeButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    typeButtons.forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    const selected = btn.getAttribute("data-type");
+    type.value = selected;
+
+    subjectFields.classList.toggle("hidden", selected !== "prova");
+    difficultyField.classList.toggle("hidden", selected !== "enem");
+  });
 });
+
 
 
 // ============================

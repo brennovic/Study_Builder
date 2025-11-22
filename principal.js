@@ -21,12 +21,17 @@ let pdfFilesBase64 = [];
 // ============================
 // ANIMAÇOES
 // ============================
-function mostrarLoading() {
+
+function iniciarGeracaoRotina() {
+  document.getElementById("formContent").style.display = "none";
   document.getElementById("loadingLottie").style.display = "block";
+  document.getElementById("loadingButtons").style.display = "block";
 }
 
-function esconderLoading() {
+function finalizarGeracaoRotina() {
   document.getElementById("loadingLottie").style.display = "none";
+  document.getElementById("loadingButtons").style.display = "none";
+  document.getElementById("formContent").style.display = "block";
 }
 
 
@@ -203,7 +208,7 @@ console.log("Texto extraído:", textoPDF);
 // ============================
 
 async function gerarRotinaDiaADia(r) {
-  mostrarLoading(); // Mostra animação
+  iniciarGeracaoRotina(); // ⬅ Liga o modo "gerando"
 
   const hoje = new Date();
   const fim = new Date(r.endDate);
@@ -231,9 +236,10 @@ async function gerarRotinaDiaADia(r) {
     rotinaGerada[`Dia ${dia}`] = topicos;
   }
 
-  esconderLoading(); // Esconde animação depois de gerar tudo
+  finalizarGeracaoRotina(); // ⬅ Desliga o modo "gerando"
   return rotinaGerada;
 }
+
 
 
 

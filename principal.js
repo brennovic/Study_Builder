@@ -18,7 +18,22 @@ const pdfInput = document.getElementById("pdfInput");
 const pdfList = document.getElementById("pdfList");
 let pdfFilesBase64 = [];
 
-const API_KEY = "AIzaSyCCvPR28WmKKWovIhSo3gZvOl0bCbz2wrE";
+// ============================
+// ANIMAÇOES
+// ============================
+function mostrarLoading() {
+  document.getElementById("loadingLottie").style.display = "block";
+}
+
+function esconderLoading() {
+  document.getElementById("loadingLottie").style.display = "none";
+}
+
+
+// ============================
+// API
+// ============================
+const API_KEY = "AIzaSyC6ZZbuWkfOiUtdzmAeGNfuGBa1zvH-siI";
 
 
 // ============================
@@ -46,13 +61,12 @@ function renderRoutines() {
     const diffSemanas = Math.ceil(diffDias / 7);
 
     card.innerHTML = `
-      <h3>${
+            <h3>${
         r.type === "enem"
           ? "Rotina ENEM"
-          : r.type === "prova"
-          ? "Prova Escolar"
-          : "Concurso"
+          : "Prova Escolar"
       }</h3>
+
       <p>${r.hoursPerDay}h/dia · ${r.daysPerWeek} dias/semana</p>
       <p>Até: ${new Date(r.endDate).toLocaleDateString("pt-BR")}</p>
       <p>⏳ ${diffDias} dias restantes (${diffSemanas} semanas)</p>
@@ -96,8 +110,6 @@ typeButtons.forEach(btn => {
     difficultyField.classList.toggle("hidden", selected !== "enem");
   });
 });
-
-
 
 // ============================
 // UPLOAD DE PDFs
@@ -191,6 +203,8 @@ console.log("Texto extraído:", textoPDF);
 // ============================
 
 async function gerarRotinaDiaADia(r) {
+  mostrarLoading(); // Mostra animação
+
   const hoje = new Date();
   const fim = new Date(r.endDate);
   const diffMs = fim - hoje > 0 ? fim - hoje : 0;
@@ -206,7 +220,6 @@ async function gerarRotinaDiaADia(r) {
         : gerarPromptGeral(r, dia, totalDias);
 
     const materiaisTexto = await coletarTextoDosMateriais(r);
-
     const resposta = await gerarRespostaIA(prompt, materiaisTexto);
     if (!resposta) continue;
 
@@ -218,8 +231,10 @@ async function gerarRotinaDiaADia(r) {
     rotinaGerada[`Dia ${dia}`] = topicos;
   }
 
+  esconderLoading(); // Esconde animação depois de gerar tudo
   return rotinaGerada;
 }
+
 
 
 // ============================

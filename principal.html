@@ -5,15 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Study Builder</title>
     <link rel="stylesheet" href="principal.css" />
+   <script src="https://cdn.jsdelivr.net/npm/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
   </head>
   <body>
-    <header class="header">
-      <h1>Study Builder</h1>
-      <div class="header-buttons">
-        <button title="Usuário">👤</button>
-        <button title="Configurações">⚙️</button>
-      </div>
-    </header>
+   <header class="header">
+  <h1>Study Builder</h1>
+
+  <nav class="header-menu">
+    <a class="menu-btn" href="redacao.html">Redação</a>
+    <a class="menu-btn" href="principal.html">Rotina</a>
+     <a class="menu-btn" href="enem.html">Materiais</a>
+  </nav>
+
+  <div class="header-buttons">
+    <button title="Usuário">👤</button>
+   <!-- <button title="Configurações">⚙️</button>  -->
+  </div>
+</header>
+
 
     <main class="container">
       <h2>Suas Rotinas de Estudo</h2>
@@ -70,16 +80,30 @@
 
         <label>Horas por dia:</label>
         <input type="number" id="hours" min="1" max="24" placeholder="2" />
-
+   <!-- ANIMAÇÃO DE CARREGAMENTO -->
+      <dotlottie-wc
+  id="loadingLottie"
+  src="https://lottie.host/bcf6302c-d11a-43a2-8e92-27d7b05cb0ea/RjtpWaD0jW.lottie"
+  style="width: 350px; height: 200px; display:none; margin: 20px auto;"
+  autoplay
+  loop>
+</dotlottie-wc>
         <div class="modal-actions">
           <button id="cancelBtn" class="outline">Cancelar</button>
           <button id="saveBtn">Salvar</button>
         </div>
+     
+
+
+
       </div>
     </div>
 
     <script src="principal.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+ <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.5/dist/dotlottie-wc.js" type="module"></script>
+
+
 
   </body>
 </html>
